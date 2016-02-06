@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import sqlprocedurebuilder.MSSQLProcBuilder;
@@ -26,28 +27,33 @@ public class Main {
 	}
 	
 	
+	private enum ProcedureBuildType{
+		ONEFILEALLTABLES,
+		ONEFILEPERTABLE
+	}
+	
 	  
 	public static void main(String[] args) {
 		
-		String lDbConnection = "jdbc:sqlserver://RHODES-PC\\RHODES_HOME_PC;database=NOP360DEV";
-		String lDbUser= "sa";
-		String lDbPassword="gianC07";
-		String lGetAllTablesSelect = "SELECT TABLE_NAME FROM NOP360DEV.INFORMATION_SCHEMA.Tables";
-		String lGetAllMetaColumnsForTable ="SELECT c.name 'columnname', t.Name 'datatype', c.max_length 'maxlength', c.precision, c.scale, c.is_nullable 'isnullable', " +
-	     "ISNULL(i.is_primary_key, 0) 'primarykey' FROM sys.columns c INNER JOIN sys.types t ON c.user_type_id = t.user_type_id LEFT OUTER JOIN " +
-	     "sys.index_columns ic ON ic.object_id = c.object_id AND ic.column_id = c.column_id LEFT OUTER JOIN " +
-	     "sys.indexes i ON ic.object_id = i.object_id AND ic.index_id = i.index_id WHERE " +
-	     "c.object_id = OBJECT_ID('TABLENAME')";
+	
 		
 	      
-	    MSSQLProcBuilder lMSSQLProcBuilder = new MSSQLProcBuilder(lDbConnection,lDbUser, lDbPassword, lGetAllTablesSelect);
+	    MSSQLProcBuilder lMSSQLProcBuilder = new MSSQLProcBuilder(MSSQLProcBuilder.DbConnection, MSSQLProcBuilder.DbUser, MSSQLProcBuilder.DbPassword);	    	    	        
+	   // lMSSQLProcBuilder.PrintTables();
+	    lMSSQLProcBuilder.PrintAllMetaRows();
+	
+	    
 	      
-	    //   x.CreateProcFile("C:/Temp", "test.sql");
-	      List<String> lAllTables = new ArrayList<String>();
+	      // x.CreateProcFile("C:/Temp", "test.sql");
+	     // List<String> lAllTables = new ArrayList<String>();
 	      
-	      lAllTables = lMSSQLProcBuilder.GetAllTables(lMSSQLProcBuilder.get_all_tables_sql());
-	      System.out.println("Get all tables in list<string>");
-	      	      	            
+	      //lAllTables = lMSSQLProcBuilder.GetAllTables(lMSSQLProcBuilder.get_all_tables_sql());
+	      
+	      //lAllTables = lMSSQLProcBuilder.get_all_tables_list();
+	      //System.out.println("Get all tables in list<string>");
+	      
+	    
+	    /*
 	      List<MetaRow> lMetaRowList = new ArrayList<MetaRow>(); 
 	      
 	      for (int tablecounter = 0; tablecounter < lAllTables.size();tablecounter++){
@@ -57,13 +63,70 @@ public class Main {
 	    	  //System.out.println(lSQLMetaColumnSelect);
 	    	  lMetaRowList = lMSSQLProcBuilder.GetAllMetaRowsForTable(lSQLMetaColumnSelect, lAllTables.get(tablecounter));
 	    	  
-	    	  //TODO - iterate thru the columns 
-	    	  for (int rowcounter = 0; rowcounter < lMetaRowList.size();rowcounter++){
+	    	  
+	    
+	    
+	    	 
+	    	 
+	    	 
+	    	 // update specific arguments
+	    	 String lUpdateParameterColumns = "@aaa int,\n@bbb nvarchar(20)\n";
+	    	 String lUpdateSetColumns = "aaa=@aaa,\nbbb=@bbb\n";
+	    	 
+	    	 
+	    
+	    	  for (int rowcounter = 0; rowcounter < lMetaRowList.size(); rowcounter++){
 	    		  MetaRow lMetaRow = new MetaRow();
 	    		  lMetaRow = lMetaRowList.get(rowcounter);
-	    		  MSSQLProcBuilder.printMetaRow(lMetaRow);
+	    		 // MSSQLProcBuilder.printMetaRow(lMetaRow);
+	    		  
+	    		  if (lMetaRow.get_isprimarykey() == true)
+	    		  {	    			  
+	    			  lPrimaryKeyName = lMetaRow.get_name();
+	    			  lPrimaryKeyDataType = lMetaRow.get_data_type();
+	    			  lTableName = lMetaRow.get_parent_table();
+	    		  }
+	    		  	    		 	    		  
+	    		  if (rowcounter  <  lMetaRowList.size() - 1){	    			  
+	    			  lSelectColumns =  lSelectColumns + "\t\t" + lMetaRow.get_name() + ",\n"; 
+	    		  }
+    			  else{    				  
+    				  lSelectColumns =  lSelectColumns + "\t\t" +lMetaRow.get_name() + "\n"; 
+	    		  }	    		  
 	    	  }
-	    	      	  
+	    	  
+	    	
+	    	  */
+	    	  
+	    	 
+	    	
+	    	//  String lCreateSelectAllRowsProcedure = lMSSQLProcBuilder.CreateSelectAllRowsProcedure(lDatabaseName, lTableName, lColumns, lAuthorName, lCreateDate, "Select All Rows From Table");	    	  
+	    	//  System.out.print(lCreateSelectAllRowsProcedure); 
+	    	  
+	    	  
+	    	//  String lCreateSelectRowProcedure = lMSSQLProcBuilder.CreateSelectRowProcedure(lDatabaseName, lTableName, lColumns, lPrimaryKeyName, lPrimaryKeyDataType, lAuthorName, lCreateDate, "Select One Row From Table Based on PK");
+	    	//  System.out.print(lCreateSelectRowProcedure);    
+	    	  
+	    	//  String lCreateDeleteRowProcedure = lMSSQLProcBuilder.CreateDeleteRowProcedure(lDatabaseName, lTableName, lPrimaryKeyName, lPrimaryKeyDataType, lAuthorName, lCreateDate, "Delete One Row From Table Based on PK");  
+	    	//  System.out.print(lCreateDeleteRowProcedure);
+	    
+	    
+	    
+		 		// get all variables that are needed for the create select all
+   	 		//	String lDatabaseName = "NOP360DEV";
+   	 		//	String lTableName = "";
+   	 		//	String lSelectColumns = "";
+   	 		//	String lPrimaryKeyName = "";
+   	 		//	String lPrimaryKeyDataType = "";
+   	 		//	String lAuthorName = "Giancarlo Rhodes";
+   	 		//	Date lDate = new Date();
+   	 		//    String lCreateDate = lDate.toString();
+	    	  
+	    	  
+	    	//  String lCreateUpdateRowProcedure = lMSSQLProcBuilder.CreateUpdateRowProcedure(lDatabaseName, lTableName, lUpdateParameterColumns, lUpdateSetColumns, lPrimaryKeyName, lPrimaryKeyDataType, lAuthorName, lCreateDate, "Update One Row, All Columns From Table Based on PK");  
+	    	//  System.out.print(lCreateUpdateRowProcedure);
+	    	  
+	    	  
 	      }
 	      
 	      
@@ -76,4 +139,4 @@ public class Main {
 	
 	  
 
-}
+
