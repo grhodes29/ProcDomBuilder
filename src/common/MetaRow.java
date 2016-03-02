@@ -1,4 +1,4 @@
-package builder;
+package common;
 
 public class MetaRow {
 	
@@ -109,6 +109,37 @@ public class MetaRow {
 	 */
 	public void set_isprimarykey(Boolean _isprimarykey) {
 		this._isprimarykey = _isprimarykey;
+	}
+	
+	
+	
+	public String ConvertSizeToString() {
+
+		String lReturn = "";
+		
+		switch(this._data_type){
+		
+		case "nvarchar":
+			if (this.get_max_length() != -1){
+				lReturn = "(" + this.get_max_length() / 2 + ")";
+			}else{
+				lReturn = "(max)";
+			}			
+			break;
+		case "varchar":
+			if (this.get_max_length() !=  -1){
+				lReturn = "(" + this.get_max_length() + ")";
+			}else{
+				lReturn = "(max)";
+			}
+			break;
+		default:
+			lReturn = "";
+			break;
+			
+		}
+				
+		return lReturn;
 	}
 
 
